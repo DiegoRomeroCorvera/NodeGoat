@@ -5,16 +5,16 @@ const {
     environmentalScripts
 } = require("../../config/config");
 
-// Constant-time string comparison (timingSafeEqual requires equal-length buffers)
-const safeEqual = (a, b) => {
-    const bufA = Buffer.from(String(a));
-    const bufB = Buffer.from(String(b));
-    return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
-};
-
 /* The SessionHandler must be constructed with a connected db */
 function SessionHandler(db) {
     "use strict";
+
+    // Constant-time string comparison (timingSafeEqual requires equal-length buffers)
+    const safeEqual = (a, b) => {
+        const bufA = Buffer.from(String(a));
+        const bufB = Buffer.from(String(b));
+        return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+    };
 
     const userDAO = new UserDAO(db);
     const allocationsDAO = new AllocationsDAO(db);
