@@ -7,7 +7,7 @@ const session = require("express-session");
 // const csrf = require('csurf');
 const consolidate = require("consolidate"); // Templating library adapter for Express
 const swig = require("swig");
-const helmet = require("helmet"); // Security headers middleware
+// const helmet = require("helmet");
 const MongoClient = require("mongodb").MongoClient; // Driver for connecting to MongoDB
 const http = require("http");
 const marked = require("marked");
@@ -35,38 +35,34 @@ MongoClient.connect(db, (err, db) => {
     }
     console.log(`Connected to the database`);
 
+    /*
     // Fix for A5 - Security MisConfig
+    // TODO: Review the rest of helmet options, like "xssFilter"
     // Remove default x-powered-by response header
     app.disable("x-powered-by");
 
-    // Security headers (helmet): X-Frame-Options (clickjacking), X-Content-Type-Options: nosniff,
-    // Strict-Transport-Security, Referrer-Policy, X-DNS-Prefetch-Control, etc.
-    app.use(helmet({
-        // Allow loading resources only from white-listed domains.
-        // 'unsafe-inline' is needed because the views use inline <script> and style attributes.
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", "data:"],
-                frameSrc: ["'self'", "https://www.youtube.com"],
-                objectSrc: ["'none'"],
-                // Do not force HTTPS: the app is served over plain HTTP by default
-                upgradeInsecureRequests: null
-            }
-        }
-    }));
+    // Prevent opening page in frame or iframe to protect from clickjacking
+    app.use(helmet.frameguard()); //xframe deprecated
 
-    // Prevents browser from caching and storing page (helmet.noCache was removed in helmet 4)
-    app.use((req, res, next) => {
-        res.set({
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-        });
-        next();
-    });
+    // Prevents browser from caching and storing page
+    app.use(helmet.noCache());
+
+    // Allow loading resources only from white-listed domains
+    app.use(helmet.contentSecurityPolicy()); //csp deprecated
+
+    // Allow communication only on HTTPS
+    app.use(helmet.hsts());
+
+    // TODO: Add another vuln: https://github.com/helmetjs/helmet/issues/26
+    // Enable XSS filter in IE (On by default)
+    // app.use(helmet.iexss());
+    // Now it should be used in hit way, but the README alerts that could be
+    // dangerous, like specified in the issue.
+    // app.use(helmet.xssFilter({ setOnOldIE: true }));
+
+    // Forces browser to only use the Content-Type set in the response header instead of sniffing or guessing it
+    app.use(nosniff());
+    */
 
     // Adding/ remove HTTP Headers for security
     app.use(favicon(__dirname + "/app/assets/favicon.ico"));
