@@ -1,16 +1,8 @@
-const crypto = require("crypto");
 const UserDAO = require("../data/user-dao").UserDAO;
 const AllocationsDAO = require("../data/allocations-dao").AllocationsDAO;
 const {
     environmentalScripts
 } = require("../../config/config");
-
-// Constant-time string comparison (timingSafeEqual requires equal-length buffers)
-const safeEqual = (a, b) => {
-    const bufA = Buffer.from(String(a));
-    const bufB = Buffer.from(String(b));
-    return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
-};
 
 /* The SessionHandler must be constructed with a connected db */
 function SessionHandler(db) {
@@ -181,7 +173,7 @@ function SessionHandler(db) {
                 " including numbers, lowercase and uppercase letters.";
             return false;
         }
-        if (!safeEqual(password, verify)) {
+        if (password !== verify) {
             errors.verifyError = "Password must match";
             return false;
         }
